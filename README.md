@@ -1,4 +1,8 @@
-HiddenMarkovModel
-=================
+HiddenMarkovModel: An Infer.NET implementation
+==============================================
 
-C# model definition for a hidden Markov model using Infer.NET. This code makes it easy to run approximate Bayesian inference over both the model parameters and states of a hidden Markov model.
+A Hidden Markov model (HMM) is a statistical tool for modelling sequential processes. The model consists of a Markov chain of discrete unobserved variables, each of which emits an observed continuous variable. The probabilistic dependencies between each of the variables in the chain is governed by a set of model parameters.
+
+This project provides a C# definition for a HMM using the [Infer.NET framework](http://research.microsoft.com/en-us/um/cambridge/projects/infernet/). This code makes it easy to run approximate Bayesian inference over both the model parameters and states of a HMM.
+http://users.ecs.soton.ac.uk/mv1g10/
+Special thanks go to Microsoft Research for releasing the Infer.NET framework under an academic licence, and to [Matteo Venanzi](http://users.ecs.soton.ac.uk/mv1g10/) for his help in implementing the HMM as an efficient chain model.
