@@ -5,4 +5,10 @@ A [Hidden Markov model](http://en.wikipedia.org/wiki/Hidden_Markov_model) (HMM) 
 
 This project provides a C# definition for a HMM using the [Infer.NET framework](http://research.microsoft.com/en-us/um/cambridge/projects/infernet/). This code makes it easy to run approximate Bayesian inference over both the model parameters and states of a HMM.
 
-Special thanks go to Microsoft Research for releasing the Infer.NET framework under an academic licence, and to [Matteo Venanzi](http://users.ecs.soton.ac.uk/mv1g10/) for his help in implementing the HMM as an efficient chain model.
+Special thanks go to Microsoft Research for adding support for chain models, and to [Matteo Venanzi](http://users.ecs.soton.ac.uk/mv1g10/) for his expertise in increasing the efficiency of the model.
+
+##### Requirements
+
+- .NET Framework 4.5
+
+- Infer.NET 2.6
