@@ -43,10 +43,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Infer.Compiler">
-      <HintPath>libraries\Infer.Compiler.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Research.InferNET.2.6.41114.1\lib\net45\Infer.Compiler.dll</HintPath>
     </Reference>
     <Reference Include="Infer.Runtime">
-      <HintPath>libraries\Infer.Runtime.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Research.InferNET.2.6.41114.1\lib\net45\Infer.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -56,12 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="libraries\Infer.Compiler.dll" />
-    <None Include="libraries\Infer.Compiler.pdb" />
-    <None Include="libraries\Infer.Compiler.xml" />
-    <None Include="libraries\Infer.Runtime.XML" />
-    <None Include="libraries\Infer.Runtime.dll" />
-    <None Include="libraries\Infer.Runtime.pdb" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -71,7 +66,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="libraries\" />
-  </ItemGroup>
 </Project>
