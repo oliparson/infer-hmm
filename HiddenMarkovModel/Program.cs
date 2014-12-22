@@ -8,13 +8,23 @@ using System.IO;
 
 namespace HiddenMarkovModel
 {
+    /// <summary>
+    /// Program.
+    /// </summary>
     class Program
     {
+        /// <summary>
+        /// The entry point of the program, where the program control starts and ends.
+        /// </summary>
+        /// <param name="args">The command-line arguments.</param>
         static void Main(string[] args)
         {
             TestHiddenMarkovModel();
         }
 
+        /// <summary>
+        /// Tests the hidden markov model.
+        /// </summary>
         static void TestHiddenMarkovModel()
         {
             // fix random seed
@@ -92,7 +102,7 @@ namespace HiddenMarkovModel
             HiddenMarkovModel model = new HiddenMarkovModel(T, K);
             model.SetPriors(ProbInitPriorObs, CPTTransPriorObs, EmitMeanPriorObs, EmitPrecPriorObs);
             model.ObserveData(emissions);
-            model.initialiseStatesRandomly();
+            model.InitialiseStatesRandomly();
             model.InferPosteriors();
             Console.WriteLine("model likelihood: " + model.ModelEvidencePosterior);
             Discrete[] mapStatesDistr = model.StatesPosterior;
@@ -130,6 +140,11 @@ namespace HiddenMarkovModel
             Console.WriteLine("------------------\n");
         }
 
+        /// <summary>
+        /// Returns the indices of sorting.
+        /// </summary>
+        /// <returns>The indices.</returns>
+        /// <param name="EmitMeanPosterior">Emit mean posterior.</param>
         public static int[] argSort(Gaussian[] EmitMeanPosterior)
         {
             int[] order = new int[EmitMeanPosterior.Length];

@@ -11,6 +11,9 @@ using System.IO;
 
 namespace HiddenMarkovModel
 {
+    /// <summary>
+    /// Hidden markov model.
+    /// </summary>
     class HiddenMarkovModel
     {
         // Set up emission data
@@ -51,10 +54,13 @@ namespace HiddenMarkovModel
         public Discrete[] StatesPosterior;
         public Bernoulli ModelEvidencePosterior;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HiddenMarkovModel.HiddenMarkovModel"/> class.
+        /// </summary>
+        /// <param name="ChainLength">Chain length.</param>
+        /// <param name="NumStates">Number states.</param>
         public HiddenMarkovModel(int ChainLength, int NumStates)
         {
-            DefineInferenceEngine();
-
             ModelEvidence = Variable.Bernoulli(0.5).Named("evidence");
             using (Variable.If(ModelEvidence))
             {
@@ -92,7 +98,7 @@ namespace HiddenMarkovModel
                     var previousState = States[t - 1];
 
                     // initial distribution
-                    using (Variable.If(t == 0))
+                    using (Variable.If((t == 0).Named("Initial")))
                     {
                         using (Variable.Switch(ZeroState))
                         {
@@ -101,7 +107,7 @@ namespace HiddenMarkovModel
                     }
 
                     // transition distributions
-                    using (Variable.If(t > 0))
+                    using (Variable.If((t > 0).Named("Transition")))
                     {
                         using (Variable.Switch(previousState))
                         {
@@ -113,36 +119,46 @@ namespace HiddenMarkovModel
                     using (Variable.Switch(States[t]))
                     {
                         Emissions[t] = Variable.GaussianFromMeanAndPrecision(EmitMean[States[t]], EmitPrec[States[t]]);
-                    }
-                    
+                    }   
                 }
             }
+
+            DefineInferenceEngine();
         }
 
+        /// <summary>
+        /// Defines the inference engine.
+        /// </summary>
         public void DefineInferenceEngine()
         {
             // Set up inference engine
             Engine = new InferenceEngine(new ExpectationPropagation());
             //Engine = new InferenceEngine(new VariationalMessagePassing());
             //Engine = new InferenceEngine(new GibbsSampling());
-            Engine.ShowFactorGraph = false;
+            Engine.ShowFactorGraph = true;
             Engine.ShowWarnings = true;
             Engine.ShowProgress = true;
             Engine.Compiler.WriteSourceFiles = true;
             Engine.NumberOfIterations = 15;
             Engine.ShowTimings = true;
-            Engine.ShowFactorGraph = false;
             Engine.ShowSchedule = false;
 
         }
 
-        public void initialiseStatesRandomly()
+        /// <summary>
+        /// Initialises the states randomly.
+        /// </summary>
+        public void InitialiseStatesRandomly()
         {
             VariableArray<Discrete> zinit = Variable<Discrete>.Array(T);
             zinit.ObservedValue = Util.ArrayInit(T.SizeAsInt, t => Discrete.PointMass(Rand.Int(K.SizeAsInt), K.SizeAsInt));
             States[T].InitialiseTo(zinit[T]);
         }
 
+        /// <summary>
+        /// Observes the data.
+        /// </summary>
+        /// <param name="emitData">Emit data.</param>
         public void ObserveData(double[] emitData)
         {
             // Save data as instance variable
@@ -151,6 +167,9 @@ namespace HiddenMarkovModel
             Emissions.ObservedValue = EmitData;
         }
 
+        /// <summary>
+        /// Infers the posteriors.
+        /// </summary>
         public void InferPosteriors()
         {
             // for monitoring convergence
@@ -169,7 +188,10 @@ namespace HiddenMarkovModel
             ModelEvidencePosterior = Engine.Infer<Bernoulli>(ModelEvidence);
         }
 
-        public void resetInference()
+        /// <summary>
+        /// Resets the inference.
+        /// </summary>
+        public void ResetInference()
         {
             // reset observations
             for (int i = 0; i < T.SizeAsInt; i++)
@@ -180,6 +202,9 @@ namespace HiddenMarkovModel
             }
         }
 
+        /// <summary>
+        /// Sets the uninformed priors.
+        /// </summary>
         public void SetUninformedPriors()
         {
             ProbInitPrior.ObservedValue = Dirichlet.Uniform(K.SizeAsInt);
@@ -188,6 +213,13 @@ namespace HiddenMarkovModel
             EmitPrecPrior.ObservedValue = Util.ArrayInit(K.SizeAsInt, k => Gamma.FromMeanAndVariance(0.1, 100)).ToArray();
         }
 
+        /// <summary>
+        /// Sets the priors.
+        /// </summary>
+        /// <param name="ProbInitPriorParamObs">Prob init prior parameter obs.</param>
+        /// <param name="CPTTransPriorObs">CPT trans prior obs.</param>
+        /// <param name="EmitMeanPriorObs">Emit mean prior obs.</param>
+        /// <param name="EmitPrecPriorObs">Emit prec prior obs.</param>
         public void SetPriors(Dirichlet ProbInitPriorParamObs, Dirichlet[] CPTTransPriorObs, Gaussian[] EmitMeanPriorObs, Gamma[] EmitPrecPriorObs)
         {
             ProbInitPrior.ObservedValue = ProbInitPriorParamObs;
@@ -196,6 +228,13 @@ namespace HiddenMarkovModel
             EmitPrecPrior.ObservedValue = EmitPrecPriorObs;
         }
 
+        /// <summary>
+        /// Sets the parameters.
+        /// </summary>
+        /// <param name="init">Init.</param>
+        /// <param name="trans">Trans.</param>
+        /// <param name="emitMeans">Emit means.</param>
+        /// <param name="emitPrecs">Emit precs.</param>
         public void SetParameters(double[] init, double[][] trans, double[] emitMeans, double[] emitPrecs)
         {
             // fix parameters
@@ -210,6 +249,9 @@ namespace HiddenMarkovModel
             EmitPrec.ObservedValue = emitPrecs;
         }
 
+        /// <summary>
+        /// Sets the parameters to MAP estimates.
+        /// </summary>
         public void SetParametersToMAPEstimates()
         {
             Vector[] trans = new Vector[K.SizeAsInt];
@@ -227,6 +269,9 @@ namespace HiddenMarkovModel
             EmitPrec.ObservedValue = emitPrec;
         }
 
+        /// <summary>
+        /// Prints the prior.
+        /// </summary>
         public void PrintPrior()
         {
             Console.WriteLine(ProbInitPrior.ObservedValue);
@@ -244,6 +289,9 @@ namespace HiddenMarkovModel
             }
         }
 
+        /// <summary>
+        /// Prints the parameters.
+        /// </summary>
         public void PrintParameters()
         {
             Console.WriteLine(ProbInit.ObservedValue);
@@ -261,6 +309,9 @@ namespace HiddenMarkovModel
             }
         }
 
+        /// <summary>
+        /// Prints the posteriors.
+        /// </summary>
         public void PrintPosteriors()
         {
             Console.WriteLine(ProbInitPosterior);
@@ -278,6 +329,10 @@ namespace HiddenMarkovModel
             }
         }
 
+        /// <summary>
+        /// Hyperparameterses to string.
+        /// </summary>
+        /// <returns>The to string.</returns>
         public string HyperparametersToString()
         {
             string returnString = "";
@@ -317,6 +372,9 @@ namespace HiddenMarkovModel
             return returnString;
         }
 
+        /// <summary>
+        /// Prints the states.
+        /// </summary>
         public void PrintStates()
         {
             string output = "state, power" + "\n";
@@ -334,6 +392,10 @@ namespace HiddenMarkovModel
             Console.WriteLine(output);
         }
 
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents the current <see cref="HiddenMarkovModel.HiddenMarkovModel"/>.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="HiddenMarkovModel.HiddenMarkovModel"/>.</returns>
         public override string ToString()
         {
             string output = "";
